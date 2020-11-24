@@ -48,7 +48,7 @@ void handleSentVar() {
   Serial.println(sensorValue2);
   Serial.println(sensorValue3);
 
-  toggle_leds();
+  // toggle_leds();
 
   server.send(200, "text/html", "Data received");
 }
@@ -59,10 +59,10 @@ void setup() {
   WiFi.softAP(ssid, password);
   IPAddress myIP = WiFi.softAPIP();
 
-  pinMode(led0, OUTPUT);
-  pinMode(led1, OUTPUT);
-  pinMode(led2, OUTPUT);
-  pinMode(led3, OUTPUT);
+  // pinMode(led0, OUTPUT);
+  // pinMode(led1, OUTPUT);
+  // pinMode(led2, OUTPUT);
+  // pinMode(led3, OUTPUT);
   
   //toggle_leds();                 //turn off all leds as all the sensor values are zero
   
