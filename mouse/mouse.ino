@@ -50,7 +50,7 @@ void handleSentVar() {
 
   // toggle_leds();
 
-  server.send(200, "text/html", "Data received");
+  server.send(200, "text/html", "OK");
 }
 
 
