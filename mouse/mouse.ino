@@ -11,7 +11,7 @@
 
 DynamicJsonBuffer jsonBuffer;
 
-const char *ssid      = "ssid";
+const char *ssid      = "chair";
 const char *password  = "password";
 
 int sensorValue0 = 0;        
@@ -36,10 +36,10 @@ void handleSentVar() {
 //  }
 //  if (root.success())
 //  {
-    sensorValue0          = root["sensor0_reading"].as<int>();
-    sensorValue1          = root["sensor1_reading"].as<int>();
-    sensorValue2          = root["sensor2_reading"].as<int>();
-    sensorValue3          = root["sensor3_reading"].as<int>();
+    sensorValue0          = root["forward"].as<int>();
+    sensorValue1          = root["backward"].as<int>();
+    sensorValue2          = root["left"].as<int>();
+    sensorValue3          = root["right"].as<int>();
 
 //  }
 

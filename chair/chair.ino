@@ -7,7 +7,7 @@
 #define btn3 0
 
 
-const char *ssid = "ssid";
+const char *ssid = "chair";
 const char *password = "password";
 
 
@@ -69,7 +69,7 @@ void loop() {
   // We now create a URI for the request. Something like /data/?sensor_reading=123
   String url = "/data/";
   url += "?sensor_reading=";
-  url +=  "{\"sensor0_reading\":\"sensor0_value\",\"sensor1_reading\":\"sensor1_value\",\"sensor2_reading\":\"sensor2_value\",\"sensor3_reading\":\"sensor3_value\"}";
+  url +=  "{\"forward\":\"sensor0_value\",\"backward\":\"sensor1_value\",\"left\":\"sensor2_value\",\"right\":\"sensor3_value\"}";
 
   url.replace("sensor0_value", String(sensorValue0));
   url.replace("sensor1_value", String(sensorValue1));
