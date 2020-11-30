@@ -63,6 +63,15 @@ void setup() {
   // pinMode(led1, OUTPUT);
   // pinMode(led2, OUTPUT);
   // pinMode(led3, OUTPUT);
+
+  // connect motor pins
+  pinMode(D1, OUTPUT);
+  pinMode(D2, OUTPUT);
+  pinMode(D0, OUTPUT);
+  pinMode(D6, OUTPUT);
+  pinMode(D7, OUTPUT);
+  pinMode(D5, OUTPUT);
+  
   
   //toggle_leds();                 //turn off all leds as all the sensor values are zero
   
@@ -72,17 +81,33 @@ void setup() {
 
 void loop() {
   server.handleClient();
+  toggle_motors();
 }
 
-void toggle_leds()
+void toggle_motors()
 {
-  if (sensorValue0 == 0)  digitalWrite(led0, LOW);
-  if (sensorValue1 == 0)  digitalWrite(led1, LOW);
-  if (sensorValue2 == 0)  digitalWrite(led2, LOW);
-  if (sensorValue3 == 0)  digitalWrite(led3, LOW);
+  digitalWrite(D0, HIGH);
+  digitalWrite(D5, HIGH);
 
-  if (sensorValue0 == 1)  digitalWrite(led0, HIGH);
-  if (sensorValue1 == 1)  digitalWrite(led1, HIGH);
-  if (sensorValue2 == 1)  digitalWrite(led2, HIGH);
-  if (sensorValue3 == 1)  digitalWrite(led3, HIGH);
+  if (sensorValue0 == 1)  {
+    digitalWrite(D1, HIGH);
+    digitalWrite(D2, LOW);
+    digitalWrite(D6, HIGH);
+    digitalWrite(D7, LOW);
+  } else if(sensorValue1 == 1){
+    digitalWrite(D1, LOW);
+    digitalWrite(D2, HIGH);
+    digitalWrite(D6, LOW);
+    digitalWrite(D7, HIGH);
+  } else if(sensorValue2 == 1) {
+    digitalWrite(D1, HIGH);
+    digitalWrite(D2, LOW);
+    digitalWrite(D6, LOW);
+    digitalWrite(D7, LOW);
+  } else if(sensorValue3 == 1) {
+    digitalWrite(D1, LOW);
+    digitalWrite(D2, LOW);
+    digitalWrite(D6, HIGH);
+    digitalWrite(D7, LOW);
+  }
 }
