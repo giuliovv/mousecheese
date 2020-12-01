@@ -13,6 +13,8 @@ int backward = 0;
 int left = 0;        
 int right = 0;   
 int stopp = 0;
+int fixedlevel = 200;
+int level = 0;
 int forward_level = 0;        
 int backward_level = 0; 
 String sensor_values;
@@ -47,13 +49,26 @@ void handleSentVar() {
   Serial.println(right);
   Serial.println(stopp);
 
-  forward_level = forward_level + (forward-backward);
-  backward_level = backward_level + (backward-forward);
+  level = level + (forward-backward);
 
-  if (forward_level > 4){ forward_level = 4 };
-  if (forward_level < 0){ forward_level = 0 };
-  if (backward_level > 4){ backward_level = 4 };
-  if (backward_level < 0){ backward_level = 0 };
+  if(stopp==1){
+    level = 0;
+  }
+
+  if (level > 4){ level = 4; };
+  if (level < -4){ level = -4; };
+
+  if (level == 0){
+    fixedlevel = 0;
+  }
+
+  if (level >= 0){
+    forward_level = fixedlevel+level*200;
+    backward_level = 0;
+  } else {
+    forward_level = 0;
+    backward_level = -fixedlevel-level*200;
+  }
 
   server.send(200, "text/html", "OK");
 }
@@ -86,30 +101,19 @@ void toggle_motors()
   digitalWrite(D0, HIGH);
   digitalWrite(D5, HIGH);
 
-  if (forward == 1)  {
-    digitalWrite(D1, HIGH);
-    digitalWrite(D2, LOW);
-    digitalWrite(D6, HIGH);
-    digitalWrite(D7, LOW);
-  } else if(backward == 1){
-    digitalWrite(D1, LOW);
-    digitalWrite(D2, HIGH);
-    digitalWrite(D6, LOW);
-    digitalWrite(D7, HIGH);
-  } else if(left == 1) {
-    digitalWrite(D1, HIGH);
-    digitalWrite(D2, LOW);
-    digitalWrite(D6, LOW);
-    digitalWrite(D7, LOW);
-  } else if(right == 1) {
-    digitalWrite(D1, LOW);
-    digitalWrite(D2, LOW);
-    digitalWrite(D6, HIGH);
-    digitalWrite(D7, LOW);
-  } else if(stopp == 1) {
-    digitalWrite(D1, LOW);
-    digitalWrite(D2, LOW);
-    digitalWrite(D6, LOW);
-    digitalWrite(D7, LOW);
+  if(right != 1){
+    analogWrite(D1, forward_level);
+    analogWrite(D2, backward_level);
+  } else {
+    analogWrite(D1, 0);
+    analogWrite(D2, 0);
   }
+  if(left != 1){
+    analogWrite(D6, forward_level);
+    analogWrite(D7, backward_level);
+  } else {
+    analogWrite(D6, 0);
+    analogWrite(D7, 0);
+  }
+
 }
