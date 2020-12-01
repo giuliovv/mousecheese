@@ -1,9 +1,22 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
-#include <ArduinoJson.h>
+#include <SoftwareSerial.h>
 
+#include <ArduinoJson.h>
+#include <DFPlayer_Mini_Mp3.h>
+
+#define ENA D0
+#define IN1 D1
+#define IN2 D2
+#define WHISKERS D3
+#define PIN_BUSY D4
+#define ENB D5
+#define IN3 D6
+#define IN4 D7
 
 DynamicJsonBuffer jsonBuffer;
+
+int whiskerread = 0;
 
 const char *ssid      = "chair";
 const char *password  = "password";
@@ -18,6 +31,8 @@ int level = 0;
 int forward_level = 0;        
 int backward_level = 0; 
 String sensor_values;
+
+SoftwareSerial mp3Serial(D1, D2);
 
 ESP8266WebServer server(80);
 
@@ -35,11 +50,11 @@ void handleSentVar() {
   }
   if (root.success())
   {
-    forward          = root["forward"].as<int>();
-    backward          = root["backward"].as<int>();
-    left          = root["left"].as<int>();
-    right          = root["right"].as<int>();
-    stopp          = root["stop"].as<int>();
+    forward = root["forward"].as<int>();
+    backward = root["backward"].as<int>();
+    left = root["left"].as<int>();
+    right = root["right"].as<int>();
+    stopp = root["stop"].as<int>();
 
   }
 
@@ -75,17 +90,29 @@ void handleSentVar() {
 
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   WiFi.softAP(ssid, password);
   IPAddress myIP = WiFi.softAPIP();
 
+  mp3Serial.begin (9600);
+  mp3_set_serial (mp3Serial);
+
+  delay(1000); 
+  mp3_set_volume (100);
+
   // connect motor pins
-  pinMode(D1, OUTPUT); //IN1
-  pinMode(D2, OUTPUT); //IN2
-  pinMode(D0, OUTPUT); //ENA
-  pinMode(D6, OUTPUT); //IN3
-  pinMode(D7, OUTPUT); //IN4
-  pinMode(D5, OUTPUT); //ENB
+  pinMode(ENA, OUTPUT); //ENA
+  pinMode(IN1, OUTPUT); //IN1
+  pinMode(IN2, OUTPUT); //IN2
+  pinMode(ENB, OUTPUT); //ENB
+  pinMode(IN3, OUTPUT); //IN3
+  pinMode(IN4, OUTPUT); //IN4
+
+  // Whisker
+  pinMode(WHISKERS, INPUT);
+
+  // Sound
+  pinMode(PIN_BUSY, INPUT);
   
   server.on("/data/", HTTP_GET, handleSentVar); // when the server receives a request with /data/ in the string then run the handleSentVar function
   server.begin();
@@ -98,22 +125,29 @@ void loop() {
 
 void toggle_motors()
 {
-  digitalWrite(D0, HIGH);
-  digitalWrite(D5, HIGH);
+  digitalWrite(ENA, HIGH);
+  digitalWrite(ENB, HIGH);
 
   if(right != 1){
-    analogWrite(D1, forward_level);
-    analogWrite(D2, backward_level);
+    analogWrite(IN1, forward_level);
+    analogWrite(IN2, backward_level);
   } else {
-    analogWrite(D1, 0);
-    analogWrite(D2, 0);
+    analogWrite(IN1, 0);
+    analogWrite(IN2, 0);
   }
   if(left != 1){
-    analogWrite(D6, forward_level);
-    analogWrite(D7, backward_level);
+    analogWrite(IN3, forward_level);
+    analogWrite(IN4, backward_level);
   } else {
-    analogWrite(D6, 0);
-    analogWrite(D7, 0);
+    analogWrite(IN3, 0);
+    analogWrite(IN4, 0);
+  }
+
+  whiskerread = digitalRead(WHISKERS);
+  if (whiskerread == 1){
+    mp3_play(1);
+  } else {
+    mp3_stop();
   }
 
 }
