@@ -5,18 +5,18 @@
 #include <ArduinoJson.h>
 #include <DFPlayer_Mini_Mp3.h>
 
-#define ENA D0
-#define IN1 D1
-#define IN2 D2
-#define WHISKERS D3
-#define PIN_BUSY D4
-#define ENB D5
-#define IN3 D6
-#define IN4 D7
+#define ENA D5
+#define IN1 D6
+#define IN2 D7
+#define WHISKERS 3
+#define PIN_BUSY D3
+#define ENB D8
+#define IN3 D0
+#define IN4 D4
 
 DynamicJsonBuffer jsonBuffer;
 
-int whiskerread = 0;
+int whiskerread = 1;
 
 const char *ssid      = "chair";
 const char *password  = "password";
@@ -26,13 +26,13 @@ int backward = 0;
 int left = 0;        
 int right = 0;   
 int stopp = 0;
-int fixedlevel = 200;
+int fixedlevel = 300;
 int level = 0;
 int forward_level = 0;        
 int backward_level = 0; 
 String sensor_values;
 
-SoftwareSerial mp3Serial(D1, D2);
+SoftwareSerial mp3Serial(D1, D2); // RX, TX
 
 ESP8266WebServer server(80);
 
@@ -78,11 +78,11 @@ void handleSentVar() {
   }
 
   if (level >= 0){
-    forward_level = fixedlevel+level*200;
+    forward_level = fixedlevel+level*175;
     backward_level = 0;
   } else {
     forward_level = 0;
-    backward_level = -fixedlevel-level*200;
+    backward_level = -fixedlevel-level*175;
   }
 
   server.send(200, "text/html", "OK");
@@ -128,24 +128,30 @@ void toggle_motors()
   digitalWrite(ENA, HIGH);
   digitalWrite(ENB, HIGH);
 
+  Serial.print("Forward: ");
+  Serial.println(forward_level);
+  Serial.print("Backward: ");
+  Serial.println(backward_level);
+
   if(right != 1){
     analogWrite(IN1, forward_level);
     analogWrite(IN2, backward_level);
   } else {
-    analogWrite(IN1, 0);
-    analogWrite(IN2, 0);
+    digitalWrite(IN1, LOW);
+    digitalWrite(IN2, LOW);
   }
   if(left != 1){
     analogWrite(IN3, forward_level);
     analogWrite(IN4, backward_level);
   } else {
-    analogWrite(IN3, 0);
-    analogWrite(IN4, 0);
+    digitalWrite(IN3, LOW);
+    digitalWrite(IN4, LOW);
   }
 
   whiskerread = digitalRead(WHISKERS);
-  if (whiskerread == 1){
-    mp3_play(1);
+  if (whiskerread == 0){
+    Serial.println("TARGET");
+    mp3_play();
   } else {
     mp3_stop();
   }
