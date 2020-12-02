@@ -74,11 +74,15 @@ void loop() {
     left = 1;
     forward = backward = 0;
     delay(500);
+  } else {
+    left = 0; 
   }
   if(gz-gz_old>10000){
     right = 1;
     forward = backward = 0;
     delay(500);
+  } else {
+    right = 0;
   }
 
   // Use WiFiClient class to create TCP connections
