@@ -1,7 +1,9 @@
+#include <MPU6050.h>
+
+#include <Wire.h>
+
+#include <I2Cdev.h>
 #include <ESP8266WiFi.h>
-#include "I2Cdev.h"
-#include "MPU6050.h"
-#include "Wire.h"
 
 MPU6050 accelgyro;
 
@@ -34,6 +36,7 @@ void setup() {
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
   }
+  Serial.println("Connected to The MouseTM");
 
 }
 
