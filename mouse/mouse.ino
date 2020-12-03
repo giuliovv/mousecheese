@@ -26,7 +26,7 @@ int backward = 0;
 int left = 0;        
 int right = 0;   
 int stopp = 0;
-int fixedlevel = 300;
+int fixedlevel = 479;
 int level = 0;
 int forward_level = 0;        
 int backward_level = 0; 
@@ -75,14 +75,15 @@ void handleSentVar() {
 
   if (level == 0){
     fixedlevel = 0;
+  } else {
+    fixedlevel = 479;
   }
-
   if (level >= 0){
-    forward_level = fixedlevel+level*175;
+    forward_level = fixedlevel+level*133;
     backward_level = 0;
   } else {
     forward_level = 0;
-    backward_level = -fixedlevel-level*175;
+    backward_level = fixedlevel-level*133;
   }
 
   server.send(200, "text/html", "OK");

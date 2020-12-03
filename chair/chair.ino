@@ -21,7 +21,7 @@ void setup() {
   Serial.begin(115200);
   delay(10);
 
-  Wire.begin(D2, D1);
+  Wire.begin(D6, D7);
   Serial.println("Initializing I2C devices...");
   accelgyro.initialize();
 
