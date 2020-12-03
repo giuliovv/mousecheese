@@ -2,7 +2,7 @@ import urllib.request
 
 def turn(forward, backward, left, right, stop):
     print(forward)
-    urllib.request.urlopen('http://192.168.4.1/data/?sensor_reading={"forward":"'+str(forward)+'","backward":"'+str(backward)+'","left":"'+str(left)+'","right":"'+str(right)+'","stop"+"'+str(stop)+'"')
+    urllib.request.urlopen('http://192.168.4.1/data/?sensor_reading={"forward":"'+str(forward)+'","backward":"'+str(backward)+'","left":"'+str(left)+'","right":"'+str(right)+'","stop":"'+str(stop)+'"}')
 
 def main():
     while True:
