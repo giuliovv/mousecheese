@@ -1,16 +1,23 @@
-import keyboard
 import urllib.request
 
 def turn(forward, backward, left, right, stop):
-    urllib.request.urlopen('http://192.168.4.1/data/?sensor_reading={"forward":"'+forward+'","backward":"'+backward+'","left":"'+left+'","right":"'+right+'","stop"+"'+stop+'"')
+    print(forward)
+    urllib.request.urlopen('http://192.168.4.1/data/?sensor_reading={"forward":"'+str(forward)+'","backward":"'+str(backward)+'","left":"'+str(left)+'","right":"'+str(right)+'","stop"+"'+str(stop)+'"')
 
 def main():
     while True:
-        keyboard.on_press_key("up", lambda : turn(1,0,0,0,0))
-        keyboard.on_press_key("down", lambda : turn(0,1,0,0,0))
-        keyboard.on_press_key("left", lambda : turn(0,0,1,0,0))
-        keyboard.on_press_key("right", lambda : turn(0,0,0,1,0))
+        key = input("Command: ")
+        if key == '\x1b[A':
+            turn(1,0,0,0,0)
+        if key == '\x1b[B':
+            turn(0,1,0,0,0)
+        if key == '\x1b[D':
+            turn(0,0,1,0,0)
+        if key == '\x1b[C':
+            turn(0,0,0,1,0)
+        if key == 's':
+            turn(0,0,0,0,1)
 
 
-if __name__ == "_main__":
+if __name__ == "__main__":
     main()
