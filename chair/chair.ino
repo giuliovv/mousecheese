@@ -113,17 +113,17 @@ void loop() {
   WiFiClient client;
   const char * host = "192.168.4.1";            //default IP address
   const int httpPort = 80;
-  
-  String url =  "{\"forward\":\"sensor0_value\",\"backward\":\"sensor1_value\",\"left\":\"sensor2_value\",\"right\":\"sensor3_value\"}";
 
-  url.replace("sensor0_value", String(forward));
-  url.replace("sensor1_value", String(backward));
-  url.replace("sensor2_value", String(left));
-  url.replace("sensor3_value", String(right));
-
-  url.toCharArray(message, 255);
-
-  UDP.beginPacket("192.168.4.1",5050);   
-  UDP.write(message);
-  UDP.endPacket();
+  if(forward == 1){
+    client.print("GET /up HTTP +/1.0");
+  }
+  if(backward == 1){
+    client.print("GET /down HTTP +/1.0");
+  }
+  if(left == 1){
+    client.print("GET /left HTTP +/1.0");
+  }
+  if(right == 1){
+    client.println("GET /right HTTP +/1.0");
+  }
 }

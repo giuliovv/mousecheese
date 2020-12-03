@@ -36,17 +36,16 @@ String sensor_values;
 SoftwareSerial mp3Serial(D1, D2); // RX, TX
 
 ESP8266WebServer server(80);
-#define UDP_PORT 5050
+unsigned int localUdpPort = 4210;
 WiFiUDP UDP;
 char incomingPacket[255];
 
+char replyPacket[] = "Hi there! Got the message :-)";
+
 void setup() {
   Serial.begin(115200);
-  Serial.println("TEST");
   WiFi.softAP(ssid, password);
   IPAddress myIP = WiFi.softAPIP();
-
-  UDP.begin(UDP_PORT);
 
   mp3Serial.begin (9600);
   mp3_set_serial (mp3Serial);
@@ -67,6 +66,44 @@ void setup() {
 
   // Sound
   pinMode(PIN_BUSY, INPUT);
+  
+  UDP.begin(localUdpPort);
+  server.on("/", home); 
+  server.on("/up", up);
+  server.on("/down", down);
+  server.on("/left", left_);
+  server.on("/right", right_);
+  server.on("/stop", stop);
+  server.begin();
+}
+
+void home() {
+  server.send(200, "text/html", "<a href='/up' onclick='return clickfunc()'>UP</a>    <a href='/down' onclick='return clickfunc()'>DOWN</a>   <a href='/left' onclick='return clickfunc()'>LEFT</a>  <a href='/right' onclick='return clickfunc()'>RIGHT</a><a href='/left' onclick='return clickfunc()'>LEFT</a>  <a href='/stop' onclick='return clickfunc()'>STOP</a>");
+} 
+
+void up(){
+  level = level + 1;
+  server.send(200, "text/html", "<a href='/'>Indietro</a> Forward!");
+}
+
+void down(){
+  level = level - 1;
+  server.send(200, "text/html", "<a href='/'>Indietro</a> Backward!");
+}
+
+void left_(){
+  left = 1;
+  server.send(200, "text/html", "<a href='/'>Indietro</a> Left!");
+}
+
+void right_(){
+  right = 1;
+  server.send(200, "text/html", "<a href='/'>Indietro</a> Right!");
+}
+
+void stop(){
+  stopp = 1;
+  server.send(200, "text/html", "<a href='/'>Indietro</a> Stop!");
 }
 
 void loop() {
@@ -105,28 +142,32 @@ void loop() {
     if(stopp==1){
       level = 0;
     }
-  
-    if (level > 4){ level = 4; };
-    if (level < -4){ level = -4; };
-  
-    if (level == 0){
-      fixedlevel = 0;
-    } else {
-      fixedlevel = 479;
-    }
-    if (level >= 0){
-      forward_level = fixedlevel+level*133;
-      backward_level = 0;
-    } else {
-      forward_level = 0;
-      backward_level = fixedlevel-level*133;
-    }
-   toggle_motors(); 
+
+    UDP.beginPacket(UDP.remoteIP(), UDP.remotePort());
+    UDP.write(replyPacket);
+    UDP.endPacket();
   }
+  server.handleClient();
+  toggle_motors();
 }
 
 void toggle_motors()
 {
+  if (level > 4){ level = 4; };
+  if (level < -4){ level = -4; };
+
+  if (level == 0){
+    fixedlevel = 0;
+  } else {
+    fixedlevel = 479;
+  }
+  if (level >= 0){
+    forward_level = fixedlevel+level*133;
+    backward_level = 0;
+  } else {
+    forward_level = 0;
+    backward_level = fixedlevel-level*133;
+  } 
   digitalWrite(ENA, HIGH);
   digitalWrite(ENB, HIGH);
 
