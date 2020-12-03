@@ -7,15 +7,15 @@ def turn(forward, backward, left, right, stop):
 def main():
     while True:
         key = input("Command: ")
-        if key == '\x1b[A':
+        if key == 'w':
             turn(1,0,0,0,0)
-        if key == '\x1b[B':
+        if key == 'z':
             turn(0,1,0,0,0)
-        if key == '\x1b[D':
+        if key == 'a':
             turn(0,0,1,0,0)
-        if key == '\x1b[C':
-            turn(0,0,0,1,0)
         if key == 's':
+            turn(0,0,0,1,0)
+        if key == ' ':
             turn(0,0,0,0,1)
 
 
