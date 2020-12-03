@@ -5,7 +5,13 @@
 #include <I2Cdev.h>
 #include <ESP8266WiFi.h>
 
+#include <WiFiUdp.h>  
+
 MPU6050 accelgyro;
+
+#define UDP_PORT 5050
+WiFiUDP UDP;
+char message[255];
 
 int16_t ax, ay, az;
 int16_t gx, gy, gz;
@@ -15,11 +21,16 @@ int forward = 0, backward = 0, left = 0, right = 0;
 
 const char *ssid = "chair";
 const char *password = "password";
+
+int lenave = 10;
+int curravepos = 0;
+int ave[10];
       
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
   delay(10);
+  UDP.begin(UDP_PORT);
 
   Wire.begin(D6, D7);
   Serial.println("Initializing I2C devices...");
@@ -48,23 +59,36 @@ void loop() {
   gz_old = gz;
 
   // display tab-separated accel/gyro x/y/z values
-  Serial.print("a/g:\t");
-  Serial.print(ax); Serial.print("\t");
-  Serial.print(ay); Serial.print("\t");
-  Serial.print(az); Serial.print("\t");
-  Serial.print(gx); Serial.print("\t");
-  Serial.print(gy); Serial.print("\t");
-  Serial.println(gz);
+  //Serial.print("a/g:\t");
+  //Serial.print(ax/9.81); Serial.print("\t");
+  //Serial.print(ay); Serial.print("\t");
+  //Serial.print(az/9.81); Serial.print("\t");
+  //Serial.print(gx); Serial.print("\t");
+  //Serial.print(gy); Serial.print("\t");
+  //Serial.println(gz);
 
-  if(ay>2000){
-    forward = 1;
-    backward = 0;
-    delay(500);
+  ave[curravepos] = ay;
+  curravepos += 1;
+  if(curravepos == lenave){
+    curravepos = 0;
   }
-  if(ay<-2000) {
-    backward = 1;
+  int res = 0;
+  for (int i=0; i< lenave; i++)
+  {
+    res += ave[i];
+  }
+  res = res/lenave;
+  Serial.println(res);
+
+  if(res<-1500){
+    forward = 1;
+  } else {
     forward = 0;
-    delay(500);
+  }
+  if(res>1000) {
+    backward = 1;
+  } else {
+    backward = 0;
   }
   Serial.print(forward); Serial.print("\t");
   Serial.println(backward);
@@ -72,15 +96,15 @@ void loop() {
   // but I couldn't get the gyro to work and the values are not tested, so when you upload it to the esp just try to test a bit and fiddle with the values to get the right behaviour
   if(gz_old-gz>10000){
     left = 1;
-    forward = backward = 0;
-    delay(500);
+    //forward = backward = 0;
+    //delay(50);
   } else {
     left = 0; 
   }
   if(gz-gz_old>10000){
     right = 1;
-    forward = backward = 0;
-    delay(500);
+    //forward = backward = 0;
+    //delay(50);
   } else {
     right = 0;
   }
@@ -89,33 +113,17 @@ void loop() {
   WiFiClient client;
   const char * host = "192.168.4.1";            //default IP address
   const int httpPort = 80;
-
-  if (!client.connect(host, httpPort)) {
-    Serial.println("connection failed");
-    return;
-  }
-
-  // We now create a URI for the request. Something like /data/?sensor_reading=123
-  String url = "/data/";
-  url += "?sensor_reading=";
-  url +=  "{\"forward\":\"sensor0_value\",\"backward\":\"sensor1_value\",\"left\":\"sensor2_value\",\"right\":\"sensor3_value\"}";
+  
+  String url =  "{\"forward\":\"sensor0_value\",\"backward\":\"sensor1_value\",\"left\":\"sensor2_value\",\"right\":\"sensor3_value\"}";
 
   url.replace("sensor0_value", String(forward));
   url.replace("sensor1_value", String(backward));
   url.replace("sensor2_value", String(left));
   url.replace("sensor3_value", String(right));
 
+  url.toCharArray(message, 255);
 
-  // This will send the request to the server
-  client.print(String("GET ") + url + " HTTP/1.1\r\n" +
-               "Host: " + host + "\r\n" +
-               "Connection: close\r\n\r\n");
-  unsigned long timeout = millis();
-  while (client.available() == 0) {
-    if (millis() - timeout > 5000) {
-      Serial.println(">>> Client Timeout !");
-      client.stop();
-      return;
-    }
-  }
+  UDP.beginPacket("192.168.4.1",5050);   
+  UDP.write(message);
+  UDP.endPacket();
 }
