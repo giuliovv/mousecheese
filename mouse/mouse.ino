@@ -92,6 +92,7 @@ void handleSentVar() {
 
 void setup() {
   Serial.begin(115200);
+  Serial.println("TEST");
   WiFi.softAP(ssid, password);
   IPAddress myIP = WiFi.softAPIP();
 
