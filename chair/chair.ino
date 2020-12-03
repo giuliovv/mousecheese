@@ -115,15 +115,23 @@ void loop() {
   const int httpPort = 80;
 
   if(forward == 1){
-    client.print("GET /up HTTP +/1.0");
+    client.print(String("GET ") + "/up" + " HTTP/1.1\r\n" +
+               "Host: " + host + "\r\n");
+    delay(100);
   }
   if(backward == 1){
-    client.print("GET /down HTTP +/1.0");
+    client.print(String("GET ") + "/down" + " HTTP/1.1\r\n" +
+               "Host: " + host + "\r\n");
+    delay(100);
   }
   if(left == 1){
-    client.print("GET /left HTTP +/1.0");
+    client.print(String("GET ") + "/left" + " HTTP/1.1\r\n" +
+               "Host: " + host + "\r\n");
+    delay(100);
   }
   if(right == 1){
-    client.println("GET /right HTTP +/1.0");
+    client.print(String("GET ") + "/right" + " HTTP/1.1\r\n" +
+               "Host: " + host + "\r\n");
+    delay(100);
   }
 }
