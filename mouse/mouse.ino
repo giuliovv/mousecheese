@@ -154,8 +154,6 @@ void toggle_motors()
   if (whiskerread == 0){
     Serial.println("TARGET");
     mp3_play();
-  } else {
-    mp3_stop();
   }
 
 }
