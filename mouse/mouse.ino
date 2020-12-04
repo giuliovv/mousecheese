@@ -94,7 +94,7 @@ void loop() {
     JsonObject& root = jsonBuffer.parseObject(incomingPacket);
     if (!root.success()) {
       Serial.println("parseObject() failed");
-      //return;
+      return;
     }
     if (root.success())
     {
@@ -150,15 +150,15 @@ void toggle_motors()
     analogWrite(IN1, forward_level);
     analogWrite(IN2, backward_level);
   } else {
-    digitalWrite(IN1, LOW);
-    digitalWrite(IN2, LOW);
+    analogWrite(IN1, 0);
+    analogWrite(IN2, 0);
   }
   if(left != 1){
     analogWrite(IN3, forward_level);
     analogWrite(IN4, backward_level);
   } else {
-    digitalWrite(IN3, LOW);
-    digitalWrite(IN4, LOW);
+    analogWrite(IN3, 0);
+    analogWrite(IN4, 0);
   }
 
   whiskerread = digitalRead(WHISKERS);
