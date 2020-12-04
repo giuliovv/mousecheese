@@ -61,55 +61,55 @@ WiFiUDP UDP;
 char packet[255];
 
 void setup() {
-tempo_old=millis();
-Wire.begin();
-Serial.begin(9600);
-WiFi.softAP(ap_id, ap_pswd);
-Serial.print("Connecting to ");
-Serial.println(ap_id);
-IPAddress ap_ip = WiFi.softAPIP();
-delay(2000); 
-Serial.begin(9600);
-Serial.println(ap_ip);
-mpu6050Begin(MPU_addr);
-UDP.begin(UDP_PORT);
-// Web-server //
-server.on("/", home); 
-server.on("/on", onpin);
-server.on("/off", offpin);
-server.on("/clear", clear_data);
-server.begin(); //avvia il server
+  tempo_old=millis();
+  Wire.begin();
+  Serial.begin(9600);
+  WiFi.softAP(ap_id, ap_pswd);
+  Serial.print("Connecting to ");
+  Serial.println(ap_id);
+  IPAddress ap_ip = WiFi.softAPIP();
+  delay(2000); 
+  Serial.begin(9600);
+  Serial.println(ap_ip);
+  mpu6050Begin(MPU_addr);
+  UDP.begin(UDP_PORT);
+  // Web-server //
+  server.on("/", home); 
+  server.on("/on", onpin);
+  server.on("/off", offpin);
+  server.on("/clear", clear_data);
+  server.begin(); //avvia il server
 }
  
 void loop() {
-server.handleClient();
-rawdata next_sample;
-setMPU6050scales(MPU_addr,0b00000000,0b00011000);
-next_sample = mpu6050Read(MPU_addr, true);
-convertRawToScaled(MPU_addr, next_sample,true);
-tempo = millis () - tempo_old;
-tempo_old = millis();
-Serial.println(tempo);
-counter=counter+1;
+  server.handleClient();
+  rawdata next_sample;
+  setMPU6050scales(MPU_addr,0b00000000,0b00011000);
+  next_sample = mpu6050Read(MPU_addr, true);
+  convertRawToScaled(MPU_addr, next_sample,true);
+  tempo = millis () - tempo_old;
+  tempo_old = millis();
+  Serial.println(tempo);
+  counter=counter+1;
 }
 // funzione che inizia la registrazione //
 void onpin() {
-x=1;
-start_play=millis();
-//digitalWrite(13,HIGH);
-server.send(200, "text/html", "<a href='/'>Indietro</a> Hai iniziato la registrazione!");
+  x=1;
+  start_play=millis();
+  //digitalWrite(13,HIGH);
+  server.send(200, "text/html", "<a href='/'>Indietro</a> Hai iniziato la registrazione!");
 }
 // funzione che stoppa la registrazione //
 void offpin() {
-x=0;
-time_play=millis()-start_play;
-Serial.print("Tempo giocato=  ");
-Serial.println(time_play/1000);
-UDP.beginPacket("192.168.4.2",5060);   
-UDP.write(convert_int16_to_str(time_play));
-UDP.endPacket();
-//digitalWrite(13,LOW);
-server.send(200, "text/html", "<a href='/'>Indietro</a> Hai terminato la registrazione!");  
+  x=0;
+  time_play=millis()-start_play;
+  Serial.print("Tempo giocato=  ");
+  Serial.println(time_play/1000);
+  UDP.beginPacket("192.168.4.2",5060);   
+  UDP.write(convert_int16_to_str(time_play));
+  UDP.endPacket();
+  //digitalWrite(13,LOW);
+  server.send(200, "text/html", "<a href='/'>Indietro</a> Hai terminato la registrazione!");  
 } 
 // azzera il numero di cadute //
 void clear_data() {

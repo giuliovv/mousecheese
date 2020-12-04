@@ -1,5 +1,4 @@
 #include <ESP8266WiFi.h>
-#include <ESP8266WebServer.h>
 #include <SoftwareSerial.h>
 #include <WiFiUdp.h> 
 
@@ -15,8 +14,6 @@
 #define IN3 D0
 #define IN4 D4
 
-DynamicJsonBuffer jsonBuffer;
-
 int whiskerread = 1;
 
 const char *ssid      = "chair";
@@ -31,21 +28,30 @@ int fixedlevel = 479;
 int level = 0;
 int forward_level = 0;        
 int backward_level = 0; 
-String sensor_values;
+//String sensor_values;
 
 SoftwareSerial mp3Serial(D1, D2); // RX, TX
 
-ESP8266WebServer server(80);
 unsigned int localUdpPort = 4210;
 WiFiUDP UDP;
 char incomingPacket[255];
-
 char replyPacket[] = "Hi there! Got the message :-)";
 
 void setup() {
   Serial.begin(115200);
   WiFi.softAP(ssid, password);
   IPAddress myIP = WiFi.softAPIP();
+
+  // set the ESP8266 to be a WiFi-client
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid, password);
+
+  Serial.println("Trying to connect ...");
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+  }
+  Serial.println("Connected to TheChairTM");
 
   mp3Serial.begin (9600);
   mp3_set_serial (mp3Serial);
@@ -66,60 +72,30 @@ void setup() {
 
   // Sound
   pinMode(PIN_BUSY, INPUT);
+
+  Serial.println(WiFi.localIP());
   
   UDP.begin(localUdpPort);
-  server.on("/", home); 
-  server.on("/up", up);
-  server.on("/down", down);
-  server.on("/left", left_);
-  server.on("/right", right_);
-  server.on("/stop", stop);
-  server.begin();
-}
-
-void home() {
-  server.send(200, "text/html", "<a href='/up' onclick='return clickfunc()'>UP</a>    <a href='/down' onclick='return clickfunc()'>DOWN</a>   <a href='/left' onclick='return clickfunc()'>LEFT</a>  <a href='/right' onclick='return clickfunc()'>RIGHT</a><a href='/left' onclick='return clickfunc()'>LEFT</a>  <a href='/stop' onclick='return clickfunc()'>STOP</a>");
-} 
-
-void up(){
-  level = level + 1;
-  server.send(200, "text/html", "<a href='/'>Indietro</a> Forward!");
-}
-
-void down(){
-  level = level - 1;
-  server.send(200, "text/html", "<a href='/'>Indietro</a> Backward!");
-}
-
-void left_(){
-  left = 1;
-  server.send(200, "text/html", "<a href='/'>Indietro</a> Left!");
-}
-
-void right_(){
-  right = 1;
-  server.send(200, "text/html", "<a href='/'>Indietro</a> Right!");
-}
-
-void stop(){
-  stopp = 1;
-  server.send(200, "text/html", "<a href='/'>Indietro</a> Stop!");
+  Serial.print("UDP on:");
+  Serial.println(localUdpPort);
 }
 
 void loop() {
+  forward = backward = left = right = stopp = 0;
   int packetSize = UDP.parsePacket();
   if (packetSize){
-    Serial.printf("Received %d bytes from %s, port %d\n", packetSize, UDP.remoteIP().toString().c_str(), UDP.remotePort());
     int len = UDP.read(incomingPacket, 255);
     if (len > 0)
     {
       incomingPacket[len] = 0;
     }
-    Serial.printf("UDP packet contents: %s\n", incomingPacket);
-    JsonObject& root = jsonBuffer.parseObject(sensor_values);
+    Serial.print("Packet received: ");
+    Serial.println(incomingPacket);
+    StaticJsonBuffer<200> jsonBuffer;
+    JsonObject& root = jsonBuffer.parseObject(incomingPacket);
     if (!root.success()) {
       Serial.println("parseObject() failed");
-      return;
+      //return;
     }
     if (root.success())
     {
@@ -147,8 +123,7 @@ void loop() {
     UDP.write(replyPacket);
     UDP.endPacket();
   }
-  server.handleClient();
-  toggle_motors();
+  //toggle_motors();
 }
 
 void toggle_motors()
