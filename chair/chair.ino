@@ -21,9 +21,13 @@ int forward = 0, backward = 0, left = 0, right = 0, stopp = 0;
 const char *ssid = "chair";
 const char *password = "password";
 
-int lenave = 10;
+int lenave = 100;
 int curravepos = 0;
-int ave[10];
+int ave[100];
+
+int lenave_short = 20;
+int curravepos_short = 0;
+int ave_short[20];
 
 int level = 0;
 int forward_level = 0;
@@ -116,12 +120,23 @@ void loop() {
     res += ave[i];
   }
   res = res/lenave;
+  ave_short[curravepos_short] = ay;
+  curravepos_short += 1;
+  if(curravepos_short == lenave_short){
+    curravepos_short = 0;
+  }
+  int res_short = 0;
+  for (int i=0; i< lenave_short; i++)
+  {
+    res_short += ave_short[i];
+  }
+  res_short = res_short/lenave_short;
   Serial.println(res);
 
-  if(res<-1500){
+  if(res_short<res*1.3){
     forward = 1;
   }
-  if(res>1000) {
+  if(res_short>res*0.7) {
     backward = 1;
   }
   Serial.print(forward);
@@ -161,4 +176,5 @@ void loop() {
   UDP.beginPacket("192.168.4.3", 4210);
   UDP.write(message);
   UDP.endPacket();
+  delay(50);
 }
