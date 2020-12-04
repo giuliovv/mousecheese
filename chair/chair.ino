@@ -133,10 +133,10 @@ void loop() {
   res_short = res_short/lenave_short;
   Serial.println(res);
 
-  if(res_short<res*1.3){
+  if(res_short<res*1.5){
     forward = 1;
   }
-  if(res_short>res*0.7) {
+  if(res_short>res*0.5) {
     backward = 1;
   }
   Serial.print(forward);
