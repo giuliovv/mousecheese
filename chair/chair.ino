@@ -21,9 +21,9 @@ int forward = 0, backward = 0, left = 0, right = 0, stopp = 0;
 const char *ssid = "chair";
 const char *password = "password";
 
-int lenave = 10;
+int lenave = 30;
 int curravepos = 0;
-int ave[10];
+int ave[30];
 
 int level = 0;
 int forward_level = 0;
@@ -91,10 +91,8 @@ void loop() {
   backward = forward = left = right = stopp = 0;
   server.handleClient();
   // read raw accel/gyro measurements from device
+  
   accelgyro.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
-  gx_old = gx;
-  gy_old = gy;
-  gz_old = gz;
 
   // display tab-separated accel/gyro x/y/z values
   //Serial.print("a/g:\t");
@@ -116,34 +114,36 @@ void loop() {
     res += ave[i];
   }
   res = res/lenave;
-  Serial.println(res);
 
-  if(res<-1500){
+  if(res<-3000){
     forward = 1;
   }
-  if(res>1000) {
+  if(res>-2000) {
     backward = 1;
+  }
+  //Serial.print(forward);
+  //Serial.print("\t");
+  //Serial.println(backward);
+  // gz_old-gz should be the difference in the angle between measurements, and that should detect turning of the wheelchair(gyro)
+  // but I couldn't get the gyro to work and the values are not tested, so when you upload it to the esp just try to test a bit and fiddle with the values to get the right behaviour
+  Serial.println(gz);
+  if(gz>10000){
+    left = 1;
+    //forward = backward = 0;
+    //delay(50);
+  }
+  if(gz<-10000){
+    right = 1;
+    //forward = backward = 0;
+    //delay(50);
   }
   Serial.print(forward);
   Serial.print("\t");
   Serial.println(backward);
-  // gz_old-gz should be the difference in the angle between measurements, and that should detect turning of the wheelchair(gyro)
-  // but I couldn't get the gyro to work and the values are not tested, so when you upload it to the esp just try to test a bit and fiddle with the values to get the right behaviour
-  if(gz_old-gz>10000){
-    left = 1;
-    //forward = backward = 0;
-    //delay(50);
-  } else {
-    left = 0; 
-  }
-  if(gz-gz_old>10000){
-    right = 1;
-    //forward = backward = 0;
-    //delay(50);
-  } else {
-    right = 0;
-  }
-
+  Serial.print("\t");
+  Serial.print(left);
+  Serial.print("\t");
+  Serial.println(right);
 
   String url = "{\"forward\":\"sensor0_value\",\"backward\":\"sensor1_value\",\"left\":\"sensor2_value\",\"right\":\"sensor3_value\",\"stop\":\"sensor_stop\"}";
 
@@ -161,4 +161,5 @@ void loop() {
   UDP.beginPacket("192.168.4.3", 4210);
   UDP.write(message);
   UDP.endPacket();
+  delay(50);
 }

@@ -35,7 +35,6 @@ SoftwareSerial mp3Serial(D1, D2); // RX, TX
 unsigned int localUdpPort = 4210;
 WiFiUDP UDP;
 char incomingPacket[255];
-char replyPacket[] = "Hi there! Got the message :-)";
 
 void setup() {
   Serial.begin(115200);
@@ -118,12 +117,8 @@ void loop() {
     if(stopp==1){
       level = 0;
     }
-
-    UDP.beginPacket(UDP.remoteIP(), UDP.remotePort());
-    UDP.write(replyPacket);
-    UDP.endPacket();
   }
-  //toggle_motors();
+  toggle_motors();
 }
 
 void toggle_motors()
