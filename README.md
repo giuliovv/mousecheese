@@ -1,4 +1,4 @@
-# Mouse cheese :carousel_horse:
+# :mouse: Mouse&Cheese :cheese:
 PlayBot4All team 3 project
 
 A robot shaped as a mouse that follows the movements of a wheelchair equipped with acceleremoters and gyroscopes.
