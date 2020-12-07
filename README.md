@@ -8,4 +8,4 @@ Flutter App: https://github.com/giuliovv/mousecheeseflutter
 
 Designed to train wheelchair users to better control their wheelchair in the context of Playbot4All.
 
-![Alt Text](./test_robot.gif)
+![test robot](./test_robot.gif)
