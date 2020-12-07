@@ -2,7 +2,7 @@
 PlayBot4All team 3 project
 
 A robot shaped as a mouse that follows the movements of a wheelchair equipped with acceleremoters and gyroscopes.
-The game aim is to reach a target, the cheese, in the lowest possible time.
+The game aim is to reach a target, the cheese, in the shortest possible time.
 
 Flutter App: https://github.com/giuliovv/mousecheeseflutter
 
