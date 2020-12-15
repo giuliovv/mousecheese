@@ -129,13 +129,9 @@ void loop() {
   Serial.println(gz);
   if(gz>10000){
     left = 1;
-    //forward = backward = 0;
-    //delay(50);
   }
   if(gz<-10000){
     right = 1;
-    //forward = backward = 0;
-    //delay(50);
   }
   Serial.print(forward);
   Serial.print("\t");
