@@ -21,6 +21,10 @@ int forward = 0, backward = 0, left = 0, right = 0, stopp = 0;
 const char *ssid = "chair";
 const char *password = "password";
 
+int lenave = 10;
+int curravepos = 0;
+int ave[10];
+
 int olday = 0;
 bool oldaction = false;
 
@@ -102,14 +106,23 @@ void loop() {
   //Serial.print(gy); Serial.print("\t");
   //Serial.println(gz);
 
+  ave[curravepos] = ay;
+  curravepos += 1;
+  if(curravepos == lenave){
+    curravepos = 0;
+  }
   int res = 0;
-  res = ay - olday;
+  for (int i=0; i< lenave; i++)
+  {
+    res += ave[i];
+  }
+  res = res/lenave;
 
-  if(res<-10000 && ! oldaction){
+  if(res>-6500 && ! oldaction){
     backward = 1;
     Serial.println("BACK");
   }
-  if(res>10000 && ! oldaction) {
+  if(res<-9000 && ! oldaction) {
     forward = 1;
     Serial.println("FORWARD");
   }
@@ -160,5 +173,5 @@ void loop() {
   UDP.beginPacket("192.168.4.3", 4210);
   UDP.write(message);
   UDP.endPacket();
-  delay(200);
+  delay(50);
 }
