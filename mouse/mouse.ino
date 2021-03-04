@@ -123,13 +123,13 @@ void loop() {
 
 void toggle_motors()
 {
-  if (level > 4){ level = 4; };
-  if (level < -4){ level = -4; };
+  if (level > 3){ level = 3; };
+  if (level < -3){ level = -3; };
 
   if (level == 0){
     fixedlevel = 0;
   } else {
-    fixedlevel = 479;
+    fixedlevel = 679;
   }
   if (level >= 0){
     forward_level = fixedlevel+level*133;
@@ -152,6 +152,7 @@ void toggle_motors()
   } else {
     analogWrite(IN1, 0);
     analogWrite(IN2, 0);
+    delay(300);
   }
   if(left != 1){
     analogWrite(IN3, forward_level);
@@ -159,6 +160,7 @@ void toggle_motors()
   } else {
     analogWrite(IN3, 0);
     analogWrite(IN4, 0);
+    delay(300);
   }
 
   whiskerread = digitalRead(WHISKERS);
