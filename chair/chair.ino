@@ -25,6 +25,8 @@ int lenave = 10;
 int curravepos = 0;
 int ave[10];
 
+int zero_error = 0;
+
 int olday = 0;
 bool oldaction = false;
 
@@ -58,10 +60,19 @@ void setup() {
   server.on("/stop", stop);
   server.begin();
 
+  for(int i = 0; i<100; i++){
+    accelgyro.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+    zero_error += ay;
+  }
+  zero_error /= 100;
+  Serial.println("Zero error: ");
+  Serial.println(zero_error);
+
+  for (int i=0; i< lenave; i++)  ave[i] = zero_error;
 }
 
 void home() {
-  server.send(200, "text/html", "<a href='#' onclick='var xmlHttp = new XMLHttpRequest(); xmlHttp.open( 'GET', '/up', false ); xmlHttp.send( null );'>UP</a>    <a href='/down'>DOWN</a>   <a href='/left' onclick='return false'>LEFT</a>  <a href='/right' onclick='return false'>RIGHT</a><a href='/left' onclick='return false'>LEFT</a>  <a href='/stop' onclick='return false'>STOP</a>");
+  server.send(200, "text/html", "<a href='/forward' onclick='return true'>UP</a>    <a href='/down'>DOWN</a>   <a href='/left' onclick='return true'>LEFT</a>  <a href='/right' onclick='return true'>RIGHT</a><a href='/left' onclick='return true'>LEFT</a>  <a href='/stop' onclick='return true'>STOP</a>");
 } 
 
 void up(){
@@ -96,6 +107,7 @@ void loop() {
   // read raw accel/gyro measurements from device
   
   accelgyro.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+  Serial.println(gz);
 
   // display tab-separated accel/gyro x/y/z values
   //Serial.print("a/g:\t");
@@ -106,11 +118,17 @@ void loop() {
   //Serial.print(gy); Serial.print("\t");
   //Serial.println(gz);
 
+
+  // adjust the zero error to new increasing error
+  zero_error = zero_error * 0.99 + ay * 0.01;
+
   ave[curravepos] = ay;
   curravepos += 1;
+  
   if(curravepos == lenave){
     curravepos = 0;
   }
+
   int res = 0;
   for (int i=0; i< lenave; i++)
   {
@@ -118,7 +136,9 @@ void loop() {
   }
   res = res/lenave;
 
-  if(res>-6500 && ! oldaction){
+  int res_adjusted = res - zero_error;
+
+  /*if(res>-6500 && ! oldaction){
     backward = 1;
     Serial.println("BACK");
   }
@@ -132,9 +152,29 @@ void loop() {
   } else {
     oldaction = false;
     olday = ay;
+  }*/
+
+  if(res_adjusted>1000 && ! oldaction){
+    backward = 1;
+    Serial.println("BACK");
   }
-  Serial.print("RES:");
-  Serial.println(res);
+  if(res_adjusted<-1000 && ! oldaction) {
+    forward = 1;
+    Serial.println("FORWARD");
+  }
+  if(forward == 1 || backward == 1){
+    oldaction = true;
+    for (int i=0; i< lenave; i++)  ave[i] = zero_error;
+    delay(300);
+  } else {
+    oldaction = false;
+    olday = ay;
+  }
+ 
+  //Serial.print("RES:");
+  //Serial.println(res);
+  //Serial.print("RES ADJUSTED:");
+  //Serial.println(res_adjusted);
   //Serial.print(forward);
   //Serial.print("\t");
   //Serial.println(backward);
@@ -143,16 +183,18 @@ void loop() {
   //Serial.println(gz);
   if(gz>10000){
     left = 1;
+    Serial.print("left");
   }
   if(gz<-10000){
     right = 1;
+    Serial.print("right");
   }
   //Serial.print("forward:");
   //Serial.println(forward);
   //Serial.print("backward:");
   //Serial.print("\t");
   //Serial.println(backward);
-  Serial.println("\t");
+  //Serial.println("\t");
   //Serial.print(left);
   //Serial.print("\t");
   //Serial.println(right);
