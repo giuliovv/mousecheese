@@ -183,11 +183,11 @@ void loop() {
   //Serial.println(gz);
   if(gz>10000){
     left = 1;
-    Serial.print("left");
+    Serial.println("left");
   }
   if(gz<-10000){
     right = 1;
-    Serial.print("right");
+    Serial.println("right");
   }
   //Serial.print("forward:");
   //Serial.println(forward);
