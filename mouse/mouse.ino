@@ -24,7 +24,7 @@ int backward = 0;
 int left = 0;        
 int right = 0;   
 int stopp = 0;
-int fixedlevel = 479;
+int fixedlevel = 679;
 int level = 0;
 int forward_level = 0;        
 int backward_level = 0; 
@@ -123,13 +123,13 @@ void loop() {
 
 void toggle_motors()
 {
-  if (level > 4){ level = 4; };
-  if (level < -4){ level = -4; };
+  if (level > 3){ level = 3; };
+  if (level < -3){ level = -3; };
 
   if (level == 0){
     fixedlevel = 0;
   } else {
-    fixedlevel = 479;
+    fixedlevel = 679;
   }
   if (level >= 0){
     forward_level = fixedlevel+level*133;
@@ -152,6 +152,7 @@ void toggle_motors()
   } else {
     analogWrite(IN1, 0);
     analogWrite(IN2, 0);
+    delay(300);
   }
   if(left != 1){
     analogWrite(IN3, forward_level);
@@ -159,12 +160,31 @@ void toggle_motors()
   } else {
     analogWrite(IN3, 0);
     analogWrite(IN4, 0);
+    delay(300);
   }
 
   whiskerread = digitalRead(WHISKERS);
   if (whiskerread == 0){
     Serial.println("TARGET");
     mp3_play();
+    // DANCE
+    analogWrite(IN1, 0);
+    analogWrite(IN2, 0);
+    analogWrite(IN3, 0);
+    analogWrite(IN4, 0);
+    analogWrite(IN2, 1000);
+    analogWrite(IN4, 1000);
+    delay(500);
+    analogWrite(IN2, 0);
+    delay(500);
+    analogWrite(IN4, 0);
+    analogWrite(IN1, 1000);
+    analogWrite(IN3, 1000);
+    delay(500);
+    analogWrite(IN1, 0);
+    analogWrite(IN2, 0);
+    analogWrite(IN3, 0);
+    analogWrite(IN4, 0);
   }
 
 }
