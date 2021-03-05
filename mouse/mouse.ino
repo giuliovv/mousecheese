@@ -24,7 +24,7 @@ int backward = 0;
 int left = 0;        
 int right = 0;   
 int stopp = 0;
-int fixedlevel = 479;
+int fixedlevel = 679;
 int level = 0;
 int forward_level = 0;        
 int backward_level = 0; 
@@ -167,6 +167,24 @@ void toggle_motors()
   if (whiskerread == 0){
     Serial.println("TARGET");
     mp3_play();
+    // DANCE
+    analogWrite(IN1, 0);
+    analogWrite(IN2, 0);
+    analogWrite(IN3, 0);
+    analogWrite(IN4, 0);
+    analogWrite(IN2, 1000);
+    analogWrite(IN4, 1000);
+    delay(500);
+    analogWrite(IN2, 0);
+    delay(500);
+    analogWrite(IN4, 0);
+    analogWrite(IN1, 1000);
+    analogWrite(IN3, 1000);
+    delay(500);
+    analogWrite(IN1, 0);
+    analogWrite(IN2, 0);
+    analogWrite(IN3, 0);
+    analogWrite(IN4, 0);
   }
 
 }
