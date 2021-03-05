@@ -29,6 +29,7 @@ int zero_error = 0;
 
 int olday = 0;
 bool oldaction = false;
+int action_treshold = 1200;
 
 int level = 0;
 int forward_level = 0;
@@ -154,11 +155,11 @@ void loop() {
     olday = ay;
   }*/
 
-  if(res_adjusted>1000 && ! oldaction){
+  if(res_adjusted>action_treshold && ! oldaction){
     backward = 1;
     Serial.println("BACK");
   }
-  if(res_adjusted<-1000 && ! oldaction) {
+  if(res_adjusted<-action_treshold && ! oldaction) {
     forward = 1;
     Serial.println("FORWARD");
   }
