@@ -166,7 +166,7 @@ void loop() {
   if(forward == 1 || backward == 1){
     oldaction = true;
     for (int i=0; i< lenave; i++)  ave[i] = zero_error;
-    delay(300);
+    delay(400);
   } else {
     oldaction = false;
     olday = ay;
